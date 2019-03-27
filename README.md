@@ -1,6 +1,8 @@
 DDI - Drug to Drug Interaction Assessment R Package
 ================
 
+<img src="man/figures/DDI-logo.png" width=250 align="right" style="margin-left:20px; margin-right: 20px;"/>
+
 Description
 -----------
 
