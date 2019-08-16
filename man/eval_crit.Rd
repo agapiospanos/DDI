@@ -4,18 +4,18 @@
 \alias{eval_crit}
 \title{Evaluates the imported patients' data for the selected DDI criteria at once.}
 \usage{
-eval_crit(selected, excel_path = NULL, exclude = NULL,
+eval_crit(selected = "all", excel_path = NULL, exclude = NULL,
   excel_out = TRUE, single_excel = TRUE, export_data_path = NULL,
   suppressNA = TRUE, excel_sheet = 1,
   excel_col_data = "med_gen__decod", excel_col_pid = "usubjid",
-  show_only_meet = FALSE)
+  show_only_meet = FALSE, show_only_sum = FALSE)
 }
 \arguments{
-\item{selected}{(Character vector) the selected criteria to export given in the form of c("DDI1, "DDI6")}
+\item{selected}{(Character vector) (optional) (default: 'all') the selected criteria to export given in the form of c("DDI1, "DDI6"). Valid options 'all' and DDI1 to DDI68.}
 
 \item{excel_path}{(Character) (optional) (default: NULL) the path that the excel file can be read from. If NULL a file choose window will be displayed so that you can choose the excel file.}
 
-\item{exclude}{(Character) (optional) (default: NULL) a vector of criteria that you want to exclude. Example: c("DDI1, "DDI6").}
+\item{exclude}{(Character) (optional) (default: NULL) a vector of criteria that you want to exclude. Example: c("DDI1, "DDI6"). Valid options DDI1 to DDI68.}
 
 \item{excel_out}{(Boolean) (optional) (default: TRUE) output excel file with the evaluated data.}
 
@@ -32,6 +32,8 @@ eval_crit(selected, excel_path = NULL, exclude = NULL,
 \item{excel_col_pid}{(Character) (optional) (default: 'usubjid') the column name that specifies the patient id in the excel you provided for the data.}
 
 \item{show_only_meet}{(Boolean) (optional) (default: FALSE) set to TRUE if you want to have exported in the excel only the patients that meet the conditions for this criterion}
+
+\item{show_only_sum}{(Boolean) (optional) (default: FALSE) set to TRUE if you want to show only the number of number of criteria that are met for each patient and a boolean value of 0 if no criterion is met and 1 if at least one is met.}
 }
 \description{
 Evaluates the imported patients' data for the selected DDI criteria at once.

@@ -3,9 +3,9 @@
 #' @author
 #' Agapios Panos <panosagapios@gmail.com>
 #'
-#' @param selected (Character vector) the selected criteria to export given in the form of c("DDI1, "DDI6")
+#' @param selected (Character vector) (optional) (default: 'all') the selected criteria to export given in the form of c("DDI1, "DDI6"). Valid options 'all' and DDI1 to DDI68.
 #' @param excel_path (Character) (optional) (default: NULL) the path that the excel file can be read from. If NULL a file choose window will be displayed so that you can choose the excel file.
-#' @param exclude (Character) (optional) (default: NULL) a vector of criteria that you want to exclude. Example: c("DDI1, "DDI6").
+#' @param exclude (Character) (optional) (default: NULL) a vector of criteria that you want to exclude. Example: c("DDI1, "DDI6"). Valid options DDI1 to DDI68.
 #' @param excel_out (Boolean) (optional) (default: TRUE) output excel file with the evaluated data.
 #' @param single_excel (Boolean) (optional) (default: TRUE) if true outputs only 1 excel file with multiple columns instead of multiple files (one for each criterion)
 #' @param export_data_path (Character) (optional) (default: NULL (a popup message to choose dir will be displayed)) the path for excel file output.
@@ -14,20 +14,23 @@
 #' @param excel_col_data (Character) (optional) (default: 'med_gen__decod') the column name of the column that stores the ATC codes data in the provided excel file.
 #' @param excel_col_pid (Character) (optional) (default: 'usubjid') the column name that specifies the patient id in the excel you provided for the data.
 #' @param show_only_meet (Boolean) (optional) (default: FALSE) set to TRUE if you want to have exported in the excel only the patients that meet the conditions for this criterion
+#' @param show_only_sum (Boolean) (optional) (default: FALSE) set to TRUE if you want to show only the number of number of criteria that are met for each patient and a boolean value of 0 if no criterion is met and 1 if at least one is met.
 #'
 #' @importFrom writexl write_xlsx
 #' @importFrom stats setNames
 #'
 #' @export
 
-eval_crit <- function(selected, excel_path = NULL, exclude = NULL, excel_out = TRUE, single_excel = TRUE, export_data_path = NULL, suppressNA = TRUE, excel_sheet = 1, excel_col_data = 'med_gen__decod', excel_col_pid = 'usubjid', show_only_meet = FALSE) {
+eval_crit <- function(selected = 'all', excel_path = NULL, exclude = NULL, excel_out = TRUE, single_excel = TRUE, export_data_path = NULL, suppressNA = TRUE, excel_sheet = 1, excel_col_data = 'med_gen__decod', excel_col_pid = 'usubjid', show_only_meet = FALSE, show_only_sum = FALSE) {
 
     # checking the excel_path. If NULL a file choose message will be displayed.
     excel_path <- chk_file(excel_path)
     cat('You selected the following excel file: ', excel_path)
 
-    # choosing an export path for the excel file that contains the evaluated patients' data.
-    export_data_path <- choose_export_path(export_data_path)
+    if (excel_out) {
+        # choosing an export path for the excel file that contains the evaluated patients' data.
+        export_data_path <- choose_export_path(export_data_path)
+    }
 
     # importing the patients' data from the excel file
     data <- import_excel_data(path = excel_path, worksheet = excel_sheet, var_col = excel_col_data, include_missing = suppressNA, ignore_na = suppressNA, excel_col_pid = excel_col_pid )
@@ -115,30 +118,49 @@ eval_crit <- function(selected, excel_path = NULL, exclude = NULL, excel_out = T
             cat(crit,': ', fulfill_count, 'patients out of', total_count, 'patients meet the conditions for the criterion.', missing_count, 'patients have missing data. \n')
         }
 
-        if (excel_out) {
-            if (single_excel) {
-                if (j == 1) {
-                    all_criteria <- names(pdata)
-                }
+        if (j == 1) {
+            all_criteria <- names(pdata)
+        }
 
-                # keeping the results to data.frames
-                all_criteria_colnames <- cbind(all_criteria_colnames, crit)
-                all_criteria <- cbind(all_criteria, as.data.frame(evaluated_patients)$status)
-            } else {
-                # export the evaluated list of patients to excel file
-                write_xlsx(evaluated_patients, path = paste0( export_data_path, '/', crit, '.xlsx'), col_names = TRUE)
-            }
+        # keeping the results to data.frames
+        all_criteria_colnames <- cbind(all_criteria_colnames, crit)
+        all_criteria <- cbind(all_criteria, as.data.frame(evaluated_patients)$status)
+
+
+        if (excel_out & !single_excel) {
+            # export the evaluated list of patients to excel file
+            write_xlsx(evaluated_patients, path = paste0( export_data_path, '/', crit, '.xlsx'), col_names = TRUE)
         }
     }
 
+    all_criteria <- as.data.frame(all_criteria)
+    all_criteria <- setNames(all_criteria, all_criteria_colnames)
+
+    ddi.found <- ddi.count <- c()
+    for (i in 1:nrow(all_criteria)) {
+        ddi.count[i] <- sum(all_criteria[unlist(selected)][i,] == 1)
+
+        if (ddi.count[i] > 0) {
+            ddi.found[i] <- 1
+        } else {
+            ddi.found[i] <- 0
+        }
+    }
+
+    sumdata <- data.frame(all_criteria[,1], ddi.count, ddi.found)
+    names(sumdata)[1] <- 'patient'
+
     if (single_excel & excel_out) {
         # generate the single excel file containing all criteria
-        all_criteria <- as.data.frame(all_criteria)
-        all_criteria <- setNames(all_criteria, all_criteria_colnames)
-        write_xlsx(all_criteria, path = paste0( export_data_path, '/DDI_critetia.xlsx'), col_names = TRUE)
-        cat('The following excel file has been exported: ', export_data_path, '\\', 'DDI_criteria.xlsx')
+        if (show_only_sum) {
+            write_xlsx(sumdata, path = paste0( export_data_path, '/DDI_critetia_sum.xlsx'), col_names = TRUE)
+            cat('The following excel file has been exported: ', export_data_path, '/', 'DDI_criteria.xlsx')
+        } else {
+            write_xlsx(all_criteria, path = paste0( export_data_path, '/DDI_critetia.xlsx'), col_names = TRUE)
+            cat('The following excel file has been exported: ', export_data_path, '/', 'DDI_criteria.xlsx')
+        }
     }
 
     # return evaluated data
-    invisible (list(all_criteria)) # instead of return as we do not want to be printed
+    invisible (list(all_criteria = all_criteria, sumdata = sumdata)) # instead of return as we do not want to be printed
 }

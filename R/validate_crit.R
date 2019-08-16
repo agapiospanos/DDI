@@ -8,7 +8,12 @@
 validate_crit <- function(selected, exclude) {
 
     # valid criteria
-    valid_crit <- c('all', 'ALL', 'DDI1', 'DDI2_3', 'DDI6', 'DDI12', 'DDI16', 'DDI24')
+    valid_crit <- c('all', 'ALL')
+
+    # adding the rest valid criteria DDI1 - DDI68
+    for (i in 1:68) {
+        valid_crit[i + 2] <- paste0('DDI',i)
+    }
 
     # checking if selected is not defined
     if (is.null(selected) | is.na(selected)) {
