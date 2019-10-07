@@ -8,7 +8,9 @@ eval_crit(selected = "all", excel_path = NULL, exclude = NULL,
   excel_out = TRUE, single_excel = TRUE, export_data_path = NULL,
   suppressNA = TRUE, excel_sheet = 1,
   excel_col_data = "med_gen__decod", excel_col_pid = "usubjid",
-  show_only_meet = FALSE, show_only_sum = FALSE)
+  excel_col_daily_dosage = "daily_dosage",
+  excel_col_med_unit = "med_unit", show_only_meet = FALSE,
+  show_only_sum = FALSE)
 }
 \arguments{
 \item{selected}{(Character vector) (optional) (default: 'all') the selected criteria to export given in the form of c("DDI1, "DDI6"). Valid options 'all' and DDI1 to DDI68.}
@@ -30,6 +32,10 @@ eval_crit(selected = "all", excel_path = NULL, exclude = NULL,
 \item{excel_col_data}{(Character) (optional) (default: 'med_gen__decod') the column name of the column that stores the ATC codes data in the provided excel file.}
 
 \item{excel_col_pid}{(Character) (optional) (default: 'usubjid') the column name that specifies the patient id in the excel you provided for the data.}
+
+\item{excel_col_daily_dosage}{(Character) (optional) (default: 'daily_dosage') the column name that specifies the daily dosage so that some DDI can take into account the dosage.}
+
+\item{excel_col_med_unit}{(Character) (optional) (default: med_unit) the column name that specifies the medicine unit (e.g. mg or g) that is used to calculate the daily dosage.}
 
 \item{show_only_meet}{(Boolean) (optional) (default: FALSE) set to TRUE if you want to have exported in the excel only the patients that meet the conditions for this criterion}
 
