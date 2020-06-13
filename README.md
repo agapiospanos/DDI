@@ -13,7 +13,7 @@ the patient ids and their status (1: if they fulfill the conditions for
 the criterion and 0: if they do not fulfill the conditions for the
 criterion.)
 
-We have included 68 criteria so far: DDI-1 to DDI-68
+We have included 69 criteria so far: DDI-1 to DDI-69
 
 ## Installation
 
