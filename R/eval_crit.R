@@ -3,9 +3,9 @@
 #' @author
 #' Agapios Panos <panosagapios@gmail.com>
 #'
-#' @param selected (Character vector) (optional) (default: 'all') the selected criteria to export given in the form of c("DDI1, "DDI6"). Valid options 'all' and DDI1 to DDI69.
+#' @param selected (Character vector) (optional) (default: 'all') the selected criteria to export given in the form of c("DDI1, "DDI6"). Valid options 'all' and DDI1 to DDI68.
 #' @param excel_path (Character) (optional) (default: NULL) the path that the excel file can be read from. If NULL a file choose window will be displayed so that you can choose the excel file.
-#' @param exclude (Character) (optional) (default: NULL) a vector of criteria that you want to exclude. Example: c("DDI1, "DDI6"). Valid options DDI1 to DDI69.
+#' @param exclude (Character) (optional) (default: NULL) a vector of criteria that you want to exclude. Example: c("DDI1, "DDI6"). Valid options DDI1 to DDI68.
 #' @param excel_out (Boolean) (optional) (default: TRUE) output excel file with the evaluated data.
 #' @param single_excel (Boolean) (optional) (default: TRUE) if true outputs only 1 excel file with multiple columns instead of multiple files (one for each criterion)
 #' @param export_data_path (Character) (optional) (default: NULL (a popup message to choose dir will be displayed)) the path for excel file output.
@@ -13,6 +13,8 @@
 #' @param excel_sheet (Character) (optional) (default: 1) the number of excel worksheet that the patient id and the ATC codes are stored.
 #' @param excel_col_data (Character) (optional) (default: 'med_gen__decod') the column name of the column that stores the ATC codes data in the provided excel file.
 #' @param excel_col_pid (Character) (optional) (default: 'usubjid') the column name that specifies the patient id in the excel you provided for the data.
+#' @param excel_col_daily_dosage (Character) (optional) (default: 'daily_dosage') the column name that specifies the daily dosage so that some DDI can take into account the dosage.
+#' @param excel_col_med_unit (Character) (optional) (default: med_unit) the column name that specifies the medicine unit (e.g. mg or g) that is used to calculate the daily dosage.
 #' @param show_only_meet (Boolean) (optional) (default: FALSE) set to TRUE if you want to have exported in the excel only the patients that meet the conditions for this criterion
 #' @param show_only_sum (Boolean) (optional) (default: FALSE) set to TRUE if you want to show only the number of number of criteria that are met for each patient and a boolean value of 0 if no criterion is met and 1 if at least one is met.
 #'
@@ -21,7 +23,7 @@
 #'
 #' @export
 
-eval_crit <- function(selected = 'all', excel_path = NULL, exclude = NULL, excel_out = TRUE, single_excel = TRUE, export_data_path = NULL, suppressNA = TRUE, excel_sheet = 1, excel_col_data = 'med_gen__decod', excel_col_pid = 'usubjid', show_only_meet = FALSE, show_only_sum = FALSE) {
+eval_crit <- function(selected = 'all', excel_path = NULL, exclude = NULL, excel_out = TRUE, single_excel = TRUE, export_data_path = NULL, suppressNA = TRUE, excel_sheet = 1, excel_col_data = 'med_gen__decod', excel_col_pid = 'usubjid', excel_col_daily_dosage = 'daily_dosage', excel_col_med_unit = 'med_unit', show_only_meet = FALSE, show_only_sum = FALSE) {
 
     # checking the excel_path. If NULL a file choose message will be displayed.
     excel_path <- chk_file(excel_path)
@@ -34,6 +36,9 @@ eval_crit <- function(selected = 'all', excel_path = NULL, exclude = NULL, excel
 
     # importing the patients' data from the excel file
     data <- import_excel_data(path = excel_path, worksheet = excel_sheet, var_col = excel_col_data, include_missing = suppressNA, ignore_na = suppressNA, excel_col_pid = excel_col_pid )
+    data <- import_excel_data(current_data = data, path = excel_path, worksheet = excel_sheet, var_col = excel_col_daily_dosage, include_missing = TRUE, ignore_na = suppressNA )
+    data <- import_excel_data(current_data = data, path = excel_path, worksheet = excel_sheet, var_col = excel_col_med_unit, include_missing = TRUE, ignore_na = suppressNA )
+
     pdata <- data[[1]]
     missing_data_patients <- data[[2]]
 
@@ -62,9 +67,12 @@ eval_crit <- function(selected = 'all', excel_path = NULL, exclude = NULL, excel
         bool_exp <- get_bool_exp(crit)
 
         # get boolean expresions and concomitant
-        boolean1 <- bool_exp[1]
-        boolean2 <- bool_exp[2]
-        concomitant <- as.logical(bool_exp[3])
+        boolean1 <- unlist(bool_exp[[1]])
+        boolean2 <- unlist(bool_exp[[2]])
+        concomitant <- unlist(as.logical(bool_exp[[3]]))
+        drugs_amount <- unlist(as.numeric(bool_exp[[4]]))
+        # we have the daily dosage check as a list ATC_CODE[[1]] AMOUNT[[2]] CHECK[[3]]
+        daily_dosage_check <- unlist(bool_exp[[5]])
 
         # iteration over all patients
         for (i in 1:length(pdata)) {
@@ -75,12 +83,15 @@ eval_crit <- function(selected = 'all', excel_path = NULL, exclude = NULL, excel
             # checking if the patient id is in the list of missing data
             if (is.na(match( pid, names(sapply(missing_data_patients, names))))){
 
+                # we get the unique pdata because an ATC code may appear more than once, thus generating false positives.
+                unique_patient_atcs <- unique(unlist(pdata[[i]][1]))
+
                 # if not concomitant we check both the atc codes against both the boolean1 and boolean2 expressions
                 if (!concomitant) {
 
                     # checking if against boolean1 and boolean2
-                    if ( any(grepl(boolean1, unlist(pdata[[i]][1]), ignore.case = T)) &
-                         any(grepl(boolean2, unlist(pdata[[i]][1]), ignore.case = T))
+                    if ( any(grepl(boolean1, unique_patient_atcs, ignore.case = T)) &
+                         any(grepl(boolean2, unique_patient_atcs, ignore.case = T))
                     ) {
                         # inserting the record to the data.frame evaluated_patients
                         evaluated_patients <- rbind(evaluated_patients, data.frame(patients = pid, status = 1, missing_variables = ''))
@@ -90,8 +101,51 @@ eval_crit <- function(selected = 'all', excel_path = NULL, exclude = NULL, excel
                     }
 
                 } else {
-                    # in the concomitant case we check if patient receives at least 2 of the ATC codes of boolean1 expression
-                    if (length(which(grepl(boolean1, unlist(pdata[[i]][1]), ignore.case = T))) > 1) {
+                    # in the concomitant case we check if patient receives at least drugs amount (e.g. 2) of the ATC codes of boolean1 expression
+
+                    # we assume that dosage problem always exist so that for DDI that we do not take into account dosage, there will be no effect in the evaluation.
+                    dosage_problem <- TRUE
+
+                    if (!is.na(daily_dosage_check[[1]])) {
+                        # we have to check for all the daily dosages...
+                        for (k in 1:length(daily_dosage_check[[1]])) {
+
+                            atc_code <- daily_dosage_check[[1]][k]
+                            thresold <- as.numeric(daily_dosage_check[[2]][k])
+                            unit <- daily_dosage_check[[3]][k]
+                            comparison <- daily_dosage_check[[4]][k]
+
+                            # we do not use the unique patient atcs as we may want to check multiple dosages
+                            patient_atcs <- unlist(pdata[[i]][1])
+                            patient_daily_dosages <- unlist(pdata[[i]][2])
+                            patient_med_units <- unlist(pdata[[i]][3])
+
+                            index <- grep(atc_code, patient_atcs, ignore.case = T)
+                            if (length(index) > 0) {
+
+                                # checking if we compare using the same units
+                                if (any(patient_med_units[index] != unit)) {
+                                    warning(paste('Patient', pid, 'has different medicine units than', unit, '. Please change the unit to', unit, '. If you do not change the unit the daily dosage will not be taken into account'))
+                                } else {
+                                    # first we remove any NA values
+                                    patient_daily_dosages <- patient_daily_dosages[!is.na(patient_daily_dosages)]
+                                    if (comparison == 'greater') {
+                                        # we have the opposite operator in the comparison
+                                        if (any(patient_daily_dosages <= thresold)) {
+                                            dosage_problem <- FALSE
+                                        }
+                                    } else if (comparison == 'lower') {
+                                        # we have the opposite operator in the comparison
+                                        if (any(patient_daily_dosages >= thresold)) {
+                                            dosage_problem <- FALSE
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (length(which(grepl(boolean1, unique_patient_atcs, ignore.case = T))) >= drugs_amount & dosage_problem) {
                         # inserting the record to the data.frame evaluated_patients
                         evaluated_patients <- rbind(evaluated_patients, data.frame(patients = pid, status = 1, missing_variables = ''))
                     } else {

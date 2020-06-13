@@ -3,11 +3,11 @@ Type: Package
 Title: DDI criteria evaluation for potential interactions between drugs
 Version: 1.1.0
 Authors@R: person("Agapios", "Panos", role = c("aut", "cre"), email = "panosagapios@gmail.com")
-Date: 2020-06-13
+Date: 2019-10-07
 Depends: R (>= 3.0.0)
 Imports: readxl (>= 1.1.0), writexl(>= 1.0), lubridate(>= 1.7.4), easycsv(>= 1.0.8)
 Maintainer: Agapios Panos <panosagapios@gmail.com>
 Description: A package that evaluates patient data for DDI (Drug to Drug Interaction) criteria and indicates the patients that are meet at least one DDI criterion.
 Encoding: UTF-8
 License: GPL (>= 2)
-RoxygenNote: 7.1.0
+RoxygenNote: 6.1.1
