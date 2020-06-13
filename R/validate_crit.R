@@ -10,8 +10,8 @@ validate_crit <- function(selected, exclude) {
     # valid criteria
     valid_crit <- c('all', 'ALL')
 
-    # adding the rest valid criteria DDI1 - DDI68
-    for (i in 1:68) {
+    # adding the rest valid criteria DDI1 - DDI69
+    for (i in 1:69) {
         valid_crit[i + 2] <- paste0('DDI',i)
     }
 

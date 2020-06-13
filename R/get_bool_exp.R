@@ -292,6 +292,10 @@ get_bool_exp <- function(criterion) {
                bool2 <- NA
                concomitant <- TRUE
                drugs_amount <- 2
+           },
+           DDI69 = {
+               bool1 <- '^N06AB|N06CA03'
+               bool2 <- '^C03A|^C03B|^C03C|^C03E|^C07B|^C07C|^C07D|^C08G|^C09BA|C09BX01|C09BX03|^C09DA|C09DX01|C09DX03|C09DX06|C09DX07|C09XA52|C09XA54|C10BX13'
            }
 
     )
