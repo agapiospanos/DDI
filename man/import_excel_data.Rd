@@ -4,9 +4,15 @@
 \alias{import_excel_data}
 \title{Imports patient data from excel file.}
 \usage{
-import_excel_data(current_data, path, worksheet, var_col,
-  ignore_na = FALSE, include_missing = FALSE,
-  excel_col_pid = "usubjid")
+import_excel_data(
+  current_data,
+  path,
+  worksheet,
+  var_col,
+  ignore_na = FALSE,
+  include_missing = FALSE,
+  excel_col_pid = "usubjid"
+)
 }
 \arguments{
 \item{current_data}{(List) the data that was imported by another call of import_excel_data so that this call will append the new data to the old ones.}

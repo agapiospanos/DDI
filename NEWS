@@ -1,8 +1,7 @@
 ***DDI, version 1.1.0 ***
 
-- fixes for concomitant checks
-- fixed bug where 1 patient had multiple same ATC codes and this triggered the detection.
-- added option for medicine daily dosage check for DDI-60 criterion. The user must now specify the excel columns for daily dosage and medicine unit.
+- added DDI69 criterion
+- built package for R 4.0.1
 
 ***DDI, version 1.0.0 ***
 
