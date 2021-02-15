@@ -1,3 +1,15 @@
+***DDI, version 1.3.0 ***
+
+- deleted criteria DDI-24, DDI-39, DDI-40 - !!!!WARNING!!!!: The criteria numbering has changed... Criterion DDI-25 has taken the place of DDI-24 because of the deletion. The same logic applies to the rest of criteria so that we have a consistent ordering from DDI-1 to DDI-66 without missing numbers inbetween... As you can expect, criteria 1 - 23 were not affected by the changes...
+- updated criterion DDI-19 - added fluconazole J02AC01
+- updated criterion DDI-30 (previously DDI-31) - 5 ATC codes were added (C01BD07, J02AC05, L01EA03, L01ED01, N05BA03) to the CYP3A4 inhibitors list
+- updated criterion DDI-36 (previously DDI-37) - N06 was replaced by N06A and N06C
+- updated criterion DDI-37 (previously DDI-38) - 5 ATC codes were added (C01BD07, J02AC05, L01EA03, L01ED01, N05BA03) to the CYP3A4 inhibitors list
+- updated criterion DDI-38 (previously DDI-41) - 2 ATC codes were added (N05AE04, G04BX14)
+- updated criterion DDI-46 (previously DDI-49) - oxycodone was deleted (N02AA05, N02AJ18, N02AJ19, N02AA55, N02AA56, N02AJ17)
+- updated criterion DDI-64 (previously DDI-67) - sertraline was deleted (N06AB06)
+- updated criterion DDI-65 (previously DDI-68) - insulin was deleted (A10A)
+
 ***DDI, version 1.2.0 ***
 
 - added criterion DDI69

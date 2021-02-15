@@ -3,9 +3,9 @@
 #' @author
 #' Agapios Panos <panosagapios@gmail.com>
 #'
-#' @param selected (Character vector) (optional) (default: 'all') the selected criteria to export given in the form of c("DDI1, "DDI6"). Valid options 'all' and DDI1 to DDI69.
+#' @param selected (Character vector) (optional) (default: 'all') the selected criteria to export given in the form of c("DDI1, "DDI6"). Valid options 'all' and DDI1 to DDI66.
 #' @param excel_path (Character) (optional) (default: NULL) the path that the excel file can be read from. If NULL a file choose window will be displayed so that you can choose the excel file.
-#' @param exclude (Character) (optional) (default: NULL) a vector of criteria that you want to exclude. Example: c("DDI1, "DDI6"). Valid options DDI1 to DDI69.
+#' @param exclude (Character) (optional) (default: NULL) a vector of criteria that you want to exclude. Example: c("DDI1, "DDI6"). Valid options DDI1 to DDI66.
 #' @param excel_out (Boolean) (optional) (default: TRUE) output excel file with the evaluated data.
 #' @param single_excel (Boolean) (optional) (default: TRUE) if true outputs only 1 excel file with multiple columns instead of multiple files (one for each criterion)
 #' @param export_data_path (Character) (optional) (default: NULL (a popup message to choose dir will be displayed)) the path for excel file output.

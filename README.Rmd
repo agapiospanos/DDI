@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 A package that provides patient data evaluation algorithm for the DDI (Drug to Drug Interaction) criteria. The patient data are parsed and their ids are classified based on whether the meet the conditions or not for each DDI criterion.
 The package exports excel files that contains the patient ids and their status (1: if they fulfill the conditions for the criterion and 0: if they do not fulfill the conditions for the criterion.)
 
-We have included 69 criteria so far: DDI-1 to DDI-69
+We have included 66 criteria so far: DDI-1 to DDI-66
 
 ## Installation
 
